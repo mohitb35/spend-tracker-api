@@ -28,6 +28,7 @@ app.post('/register', (req, res) => { registerController.handleRegister(req, res
 app.post('/login', (req, res) => { loginController.handleLogin(req, res, db, bcrypt) });
 app.post('/spend', (req, res) => { spendsController.addSpend(req, res, db) });
 app.put('/spend/:id', (req, res) => { spendsController.editSpend(req, res, db) });
+app.delete('/spend/:id', (req, res) => { spendsController.deleteSpend(req, res, db) });
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
