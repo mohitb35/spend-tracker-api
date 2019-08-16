@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+const utilities = require('./utilities');
 
 const handleRegister = (req, res, db, bcrypt, saltRounds) => {
 	// Get the details from the body
@@ -11,7 +11,7 @@ const handleRegister = (req, res, db, bcrypt, saltRounds) => {
 			user.hash = hash; 
 		})
 		// Create token to be sent back to the client to create a session
-		.then(() => createToken())
+		.then(() => utilities.createToken())
 		// Set user's token to created token
 		.then((token)=> {
 			user.token = token;
@@ -29,15 +29,6 @@ const handleRegister = (req, res, db, bcrypt, saltRounds) => {
 		});
 }
 			
-
-// crypto ships with node - we're leveraging it to create a random, secure token
-const createToken = () => {
-	return new Promise((resolve, reject) => {
-	  crypto.randomBytes(16, (err, data) => {
-		err ? reject(err) : resolve(data.toString('base64'));
-	  })
-	})
-  }
 
 // creating a user in the database
 const createUser = (user, db) => {

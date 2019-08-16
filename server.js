@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = config.SALT_ROUNDS;
 
 const registerController = require('./controllers/register');
+const loginController = require('./controllers/login');
 
 const db = knex(config.DB_CREDENTIALS);
 
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/register', (req, res) => { registerController.handleRegister(req, res, db, bcrypt, saltRounds) });
+app.post('/login', (req, res) => { loginController.handleLogin(req, res, db, bcrypt) });
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
