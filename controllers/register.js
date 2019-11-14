@@ -46,7 +46,8 @@ const createUser = (user, db) => {
 					email: user.email,
 					name: user.name,
 					token: user.token,
-					created_at: new Date()
+					created_at: new Date(),
+					last_login: new Date()
 				});
 		})
 		.then(trx.commit)

@@ -25,7 +25,8 @@ const handleLogin = (req, res, db, bcrypt) => {
 											.where('user_id', '=', userId)
 											.returning('*')
 											.update({
-												'token': token
+												'token': token,
+												'last_login': new Date()
 											})
 											.then(data => {
 												let user = data[0];
