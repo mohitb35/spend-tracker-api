@@ -16,7 +16,8 @@ const db = knex(config.DB_CREDENTIALS);
 
 const app =  express();
 app.use(cors());
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
 	db.select("*").from('spend_items').then(data => {
@@ -32,5 +33,5 @@ app.delete('/spend/:id', (req, res) => { spendsController.deleteSpend(req, res, 
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
-	console.log("Spend Tracking API Server online....");
+	console.log("Spend Tracking API Server online...." + new Date());
 });
