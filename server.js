@@ -30,6 +30,8 @@ app.post('/login', (req, res) => { loginController.handleLogin(req, res, db, bcr
 app.post('/spend', (req, res) => { spendsController.addSpend(req, res, db) });
 app.put('/spend/:id', (req, res) => { spendsController.editSpend(req, res, db) });
 app.delete('/spend/:id', (req, res) => { spendsController.deleteSpend(req, res, db) });
+app.get('/spend/categories', (req, res) => { spendsController.listCategories(req, res, db) });
+app.get('/spend/categories/:id', (req, res) => { spendsController.listSubCategories(req, res, db) });
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {

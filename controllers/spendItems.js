@@ -1,3 +1,35 @@
+const listCategories = (req, res, db) => {
+	db.select("*").from('category')
+		.then(data => {
+			if(data.length > 0) {
+				res.status(200).json(data);
+			} else {
+				res.status(200).json("No categories found");
+			}
+		})
+		.catch(err => {
+			res.status(400).json("Something went wrong");
+		});
+}
+
+const listSubCategories = (req, res, db) => {
+	let categoryId = req.params.id;
+
+	db.select("*").from('sub_category')
+		.where('category_id', '=', categoryId)
+		.then(data => {
+			if(data.length > 0) {
+				res.status(200).json(data);
+			} else {
+				res.status(200).json("No subcategories found");
+			}
+		})
+		.catch(err => {
+			res.status(400).json("Something went wrong");
+		});
+}
+
+
 const addSpend = (req, res, db) => {
 	// Get data from body
 	let spend = {
@@ -118,6 +150,8 @@ const deleteSpend = (req, res, db) => {
 }
 
 module.exports = {
+	listCategories: listCategories,
+	listSubCategories: listSubCategories,
 	addSpend: addSpend,
 	editSpend: editSpend,
 	deleteSpend: deleteSpend
