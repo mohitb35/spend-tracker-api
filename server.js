@@ -15,9 +15,9 @@ const spendsController = require('./controllers/spendItems');
 const db = knex(config.DB_CREDENTIALS);
 
 const app =  express();
+app.use(bodyParser.json());
 app.use(cors());
-// app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
 	db.select("*").from('spend_items').then(data => {
