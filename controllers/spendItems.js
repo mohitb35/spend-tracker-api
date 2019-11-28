@@ -29,6 +29,39 @@ const listSubCategories = (req, res, db) => {
 		});
 }
 
+const getDateRange = (req, res, db) => {
+	db.select('user_id').from('users')
+		.where('token', '=', req.params.token)
+		.then(user => {
+			// Check if token is valid, and user exists
+			if(user.length === 0) {
+				res.status(400).json("Invalid token. Please log out of the app and sign in again.")
+			} else {
+				if(user.length === 1) {
+					let userId = user[0]['user_id'];
+					// Get min, max date from db and return to user
+					db('spend_items').min('purchase_date').max('purchase_date')
+						.where('user_id', '=', userId)
+						.first()
+						.then(range => {
+							if(range.min === null) {
+								res.status(200).json("No spends found");
+							} else {
+								res.status(200).json(range);
+							}
+						})
+				} else {
+					// Error thrown if duplicate tokens exist in DB, for any reason.
+					throw Error("Something went wrong. More than one user IDs were returned.")
+				}
+			}
+		})
+		.catch(err => {
+			console.log(err);
+			res.status(400).json("Something went wrong. Please log out and log in again.");
+		})
+}
+
 
 const addSpend = (req, res, db) => {
 	// Get data from body
@@ -152,6 +185,7 @@ const deleteSpend = (req, res, db) => {
 module.exports = {
 	listCategories: listCategories,
 	listSubCategories: listSubCategories,
+	getDateRange: getDateRange,
 	addSpend: addSpend,
 	editSpend: editSpend,
 	deleteSpend: deleteSpend
