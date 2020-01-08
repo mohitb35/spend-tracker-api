@@ -62,6 +62,10 @@ const getDateRange = (req, res, db) => {
 		})
 }
 
+// Combine general info needed
+const getConfig = (req, res, db) => {
+
+}
 
 const addSpend = (req, res, db) => {
 	// Get data from body
@@ -182,13 +186,54 @@ const deleteSpend = (req, res, db) => {
 		})
 }
 
+const listSpends = (req, res, db) => {
+	// Get user id from token
+	db.select('user_id').from('users')
+		.where('token', '=', req.body.token)
+		.then(data => {
+			// If user exists, get spends for user between specified date range, with category and sub category names as well 
+			if(data.length){
+				let userId = data[0]['user_id'];
+				return db('spend_items as spends')
+					.join('category as cat', 'spends.category_id', 'cat.id')
+					.join('sub_category as subcat', 'spends.sub_category_id', 'subcat.id')
+					.select(
+						'spends.id',
+						'spends.purchase_date',
+						'spends.name',
+						'spends.amount',
+						'spends.category_id',
+						'cat.name as category_name',
+						'spends.sub_category_id',
+						'subcat.name as sub_category_name',
+						'spends.user_id'
+					)
+					.where('spends.user_id', '=', userId)
+					.whereBetween('spends.purchase_date', [req.body.minDate, req.body.maxDate]);
+			} else {
+				throw Error("Invalid token. Please log out of the app and sign in again.");
+			}
+		})
+		.then(spends => {
+			// Return spends if available
+			if(spends.length){
+				res.status(200).json(spends);
+			} else {
+				res.status(200).json("No spends found");
+			}
+		})
+		.catch(err => {
+			res.status(400).json(err.message);
+		})
+}
+
 module.exports = {
 	listCategories: listCategories,
 	listSubCategories: listSubCategories,
 	getDateRange: getDateRange,
 	addSpend: addSpend,
 	editSpend: editSpend,
-	deleteSpend: deleteSpend
-	/* listSpends: listSpends,
-	 */
+	deleteSpend: deleteSpend,
+	getConfig: getConfig,
+	listSpends: listSpends
 };	

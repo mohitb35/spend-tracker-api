@@ -28,11 +28,13 @@ app.get('/', (req, res) => {
 app.post('/register', (req, res) => { registerController.handleRegister(req, res, db, bcrypt, saltRounds) });
 app.post('/login', (req, res) => { loginController.handleLogin(req, res, db, bcrypt) });
 app.post('/spend', (req, res) => { spendsController.addSpend(req, res, db) });
+app.get('/spend', (req, res) => { spendsController.listSpends(req, res, db) });
 app.put('/spend/:id', (req, res) => { spendsController.editSpend(req, res, db) });
 app.delete('/spend/:id', (req, res) => { spendsController.deleteSpend(req, res, db) });
 app.get('/spend/categories', (req, res) => { spendsController.listCategories(req, res, db) });
 app.get('/spend/categories/:id', (req, res) => { spendsController.listSubCategories(req, res, db) });
 app.get('/spend/:token/daterange', (req, res) => { spendsController.getDateRange(req, res, db) });
+// app.get('/spend/:token/config', (req, res) => spendsController.getConfig(req, res, db));
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
