@@ -27,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.post('/register', (req, res) => { registerController.handleRegister(req, res, db, bcrypt, saltRounds) });
 app.post('/login', (req, res) => { loginController.handleLogin(req, res, db, bcrypt) });
+app.get('/logout', (req, res) => { loginController.handleLogout(req, res, db) });
 app.post('/spend', (req, res) => { spendsController.addSpend(req, res, db) });
 app.get('/spend', (req, res) => { spendsController.listSpends(req, res, db) });
 app.put('/spend/:id', (req, res) => { spendsController.editSpend(req, res, db) });

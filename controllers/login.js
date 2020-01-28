@@ -60,6 +60,39 @@ const handleLogin = (req, res, db, bcrypt) => {
 	
 }
 
+// Validates user ID and clears token if validation successful
+const handleLogout = (req, res, db) => {
+	let { userId,token } = req.body;
+
+	db.select('user_id').from('users')
+		.where('token', '=', token)
+		.then(data => {
+			if(data.length){
+				let fetchedUserId = data[0]['user_id'];
+				if(fetchedUserId === userId){
+					db('users')
+						.where('user_id', '=', userId)
+						.returning('*')
+						.update({
+							'token': ''
+						})
+						.then(data => {
+							console.log("Cleared token for the following user:");
+							console.log("User ID:", data[0]['user_id']);
+							console.log("Email:", data[0]['email']);
+						})
+						.catch((err) => {
+							console.log(err);
+							res.status(400).json("Error retrieving your data. Something went wrong.");
+						})
+				} else {
+					res.status(400).json("No permission for this action");
+				}
+			}
+		})
+}
+
 module.exports = {
-	handleLogin: handleLogin
+	handleLogin: handleLogin,
+	handleLogout: handleLogout
 };
