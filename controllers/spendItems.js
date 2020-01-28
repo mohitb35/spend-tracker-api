@@ -191,6 +191,10 @@ const listSpends = (req, res, db) => {
 	db.select('user_id').from('users')
 		.where('token', '=', req.body.token)
 		.then(data => {
+			if(!req.body.minDate || !req.body.maxDate){
+				req.body.minDate = new Date();
+				req.body.maxDate = new Date();
+			}
 			// If user exists, get spends for user between specified date range, with category and sub category names as well 
 			if(data.length){
 				let userId = data[0]['user_id'];
