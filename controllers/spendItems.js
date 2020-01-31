@@ -213,7 +213,8 @@ const listSpends = (req, res, db) => {
 						'spends.user_id'
 					)
 					.where('spends.user_id', '=', userId)
-					.whereBetween('spends.purchase_date', [req.body.minDate, req.body.maxDate]);
+					.whereBetween('spends.purchase_date', [req.body.minDate, req.body.maxDate])
+					.orderBy('spends.purchase_date', 'asc');
 			} else {
 				throw Error("Invalid token. Please log out of the app and sign in again.");
 			}
