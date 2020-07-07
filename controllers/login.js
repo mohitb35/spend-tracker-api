@@ -9,8 +9,8 @@ const handleLogin = (req, res, db, bcrypt) => {
 		.where('email', '=', email)
 		// For user ID returned, check if the user hash matches with password using bcrypt.compare
 		.then(data => {
-			let userId = data[0].user_id;
 			if(data.length) {
+				let userId = data[0].user_id;
 				db.select('hash').from('user_credentials')
 					.where('id','=',userId)
 					.then(data => {
@@ -30,32 +30,32 @@ const handleLogin = (req, res, db, bcrypt) => {
 											})
 											.then(data => {
 												let user = data[0];
-												res.json(user);
+												res.status(200).json(user);
 											})
 											.catch((err) => {
-												res.status(400).json("Error retrieving your data. Something went wrong.");
+												res.status(400).json("4. Error retrieving your data. Something went wrong.");
 											})
 									})
 									.catch((err) => {
-										res.status(400).json("Error retrieving your data. Something went wrong");
+										res.status(400).json("5. Error retrieving your data. Something went wrong");
 									})	
 								} else {
-									res.status(400).json("Invalid credentials. Check your email and password.");
+									res.status(400).json("3. Invalid credentials. Check your email and password.");
 								}
 							})
 							.catch((err) => {
-								res.status(400).json("Error verifying credentials. Something went wrong");
+								res.status(400).json("7. Error verifying credentials. Something went wrong");
 							})
 					})
 					.catch((err) => {
-						res.status(400).json("Error verifying your credentials. Something went wrong.")
+						res.status(400).json("6. Error verifying your credentials. Something went wrong.")
 					})
 			} else {
-				res.status(400).json("Invalid credentials. Check your email and password.");
+				res.status(400).json("2. Invalid credentials. Check your email and password.");
 			}
 		})
 		.catch((err) => {
-			res.status(400).json("Invalid credentials. Check your email and password.");
+			res.status(400).json("1. Error retrieving your data. Something went wrong.");
 		})
 	
 }
