@@ -1,7 +1,7 @@
 const utilities = require('./utilities');
 
 const handleLogin = async (req, res, db, bcrypt) => {
-	// Get the details from the body
+	// Get the details from the request body
 	let { email, password } = req.body;
 
 	// Check if email exists in the database, and get corresponding user ID
@@ -16,7 +16,7 @@ const handleLogin = async (req, res, db, bcrypt) => {
 	if (!userData.length){
 		return res.status(400).json("2. Invalid credentials. Check your email and password.");
 	} else {
-		let userId = userData[0].user_id;
+		let userId = userData[0]['user_id'];
 
 		// Fetch hash for the fetched user ID
 		let hashData;
@@ -71,40 +71,54 @@ const handleLogin = async (req, res, db, bcrypt) => {
 			return res.status(400).json("4. Error retrieving your data. Something went wrong.");
 		}
 	}
-}
+};
 
 		
 // Validates user ID and clears token if validation successful
-const handleLogout = (req, res, db) => {
+const handleLogout = async (req, res, db) => {
+	console.log(req.body);
+	// Get the details from the request body
 	let { userId,token } = req.body;
 
-	db.select('user_id').from('users')
-		.where('token', '=', token)
-		.then(data => {
-			if(data.length){
-				let fetchedUserId = data[0]['user_id'];
-				if(fetchedUserId === userId){
-					db('users')
-						.where('user_id', '=', userId)
-						.returning('*')
-						.update({
-							'token': ''
-						})
-						.then(data => {
-							console.log("Cleared token for the following user:");
-							console.log("User ID:", data[0]['user_id']);
-							console.log("Email:", data[0]['email']);
-						})
-						.catch((err) => {
-							console.log(err);
-							res.status(400).json("Error retrieving your data. Something went wrong.");
-						})
-				} else {
-					res.status(400).json("No permission for this action");
-				}
+	// Get user ID based on token
+	let userData;
+	try {
+		userData = await db.select('user_id').from('users').where('token', '=', token);
+	} catch {
+		return res.status(400).json("Error retrieving your data. Something went wrong.");
+	}
+
+	if(!userData.length){
+		return res.status(400).json("Error retrieving your data. Something went wrong.")
+	} else {
+		let fetchedUserId = userData[0]['user_id'];
+		
+		// Verifies userId for the user logging out
+		if (fetchedUserId === userId) {
+			let userInfo;
+
+			try {
+				userInfo = await db('users')
+					.where('user_id', '=', userId)
+					.returning('*')
+					.update({
+						'token': null
+					});
+			} catch (err) {
+				console.log(err);
+				return res.status(400).json("Error updating data. Something went wrong");
 			}
-		})
-}
+
+			console.log("Cleared token for the following user:");
+			console.log("User ID:", userInfo[0]['user_id']);
+			console.log("Email:", userInfo[0]['email']);
+			return res.status(200).json("Logged out successfully");
+
+		} else {
+			return res.status(400).json("No permission for this action");
+		}
+	}
+};
 
 module.exports = {
 	handleLogin: handleLogin,
