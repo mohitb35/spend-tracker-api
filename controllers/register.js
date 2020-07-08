@@ -19,7 +19,7 @@ const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
 	// If user exists already, return error, otherwise move ahead with creation
 	if(userData.length !== 0){
 		if(userData[0].user_id){
-			return res.status(422).json("3. There is already an existing user with this email address");
+			return res.status(409).json("3. There is already an existing user with this email address");
 		} else {
 			return res.status(500).json("4. Error retrieving data. Something went wrong");
 		}
