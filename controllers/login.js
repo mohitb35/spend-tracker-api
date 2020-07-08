@@ -76,7 +76,6 @@ const handleLogin = async (req, res, db, bcrypt) => {
 		
 // Validates user ID and clears token if validation successful
 const handleLogout = async (req, res, db) => {
-	console.log(req.body);
 	// Get the details from the request body
 	let { userId,token } = req.body;
 
@@ -105,7 +104,6 @@ const handleLogout = async (req, res, db) => {
 						'token': null
 					});
 			} catch (err) {
-				console.log(err);
 				return res.status(400).json("Error updating data. Something went wrong");
 			}
 
