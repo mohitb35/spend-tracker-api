@@ -1,50 +1,50 @@
 const utilities = require('./utilities');
 
-const handleRegister = (req, res, db, bcrypt, saltRounds) => {
+const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
 	// Get the details from the body
 	let user = req.body;
+
 	// Check if the user already exists
-	db.select('user_id').from('users')
-		.where('email', '=', user.email)
-		// If user exists already, return error, otherwise move ahead with creation
-		.then(data => {
-			if(data.length !== 0) {
-				if(data[0].user_id) {
-					res.status(500).json("There is already an existing user with this email address");
-				} else {
-					res.status(400).json("Something went wrong");
-				}
-			} else {
-				// Hash the plain text password using bcrypt
-				bcrypt.hash(user.password, saltRounds)
-				.then((hash) => {
-					delete user.password;
-					// set user's hash to encrypted pw
-					user.hash = hash; 
-				})
-				// Create token to be sent back to the client to create a session
-				.then(() => utilities.createToken())
-				// Set user's token to created token
-				.then((token)=> {
-					user.token = token;
-				})
-				// Save hashed password to db for the user and save user data to db with created token
-				.then(() => createUser(user, db))
-				// Return info of created user
-				.then((insertedUser) => {
-					delete user.hash;
-					res.status(201).json(insertedUser);
-				})
-				.catch((err) => {
-					console.log("This was the error:", err);
-					res.status(400).json("Something went wrong");
-				});
-			}
-		})
-		.catch((err) => {
-			console.log("This was the error:", err);
-			res.status(400).json("Something went wrong");
-		})
+	let userData;
+	try {
+		userData = await db.select('user_id').from('users').where('email', '=', user.email);
+	} catch {
+		return res.status(400).json("1. Error retrieving data. Something went wrong.");
+	}
+
+	// If user exists already, return error, otherwise move ahead with creation
+	if(userData.length !== 0){
+		if(userData[0].user_id){
+			return res.status(500).json("2. There is already an existing user with this email address");
+		} else {
+			return res.status(400).json("3. Error retrieving data. Something went wrong");
+		}
+	} else {
+		// Hash the plain text password using bcrypt, and set the user's hash to the encrypted hash
+		let hash, token, insertedUser;
+		try {
+			hash = await bcrypt.hash(user.password, saltRounds);
+			delete user.password;
+			user.hash = hash;
+		} catch {
+			return res.status(400).json("4. Error creating account. Something went wrong.");
+		}
+
+		try {
+			token = await utilities.createToken();
+			user.token = token;
+		} catch {
+			return res.status(400).json("5. Error creating account. Something went wrong.");
+		}
+
+		try {
+			insertedUser = await createUser(user, db);
+			delete user.hash;
+			return res.status(201).json(insertedUser);
+		} catch {
+			return res.status(400).json("6. Error creating account. Something went wrong.");
+		}
+	}
 }
 			
 
@@ -71,7 +71,7 @@ const createUser = (user, db) => {
 		.then(trx.commit)
 		.catch((err) => {
 			trx.rollback();
-			throw err;
+			throw Error(err);
 		})
 	})
 	.then((data) => {
