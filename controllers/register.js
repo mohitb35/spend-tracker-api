@@ -4,20 +4,24 @@ const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
 	// Get the details from the body
 	let user = req.body;
 
+	if (!user.name || !user.email || !user.password){
+		return res.status(400).json("1. Missing request parameters");
+	}
+
 	// Check if the user already exists
 	let userData;
 	try {
 		userData = await db.select('user_id').from('users').where('email', '=', user.email);
 	} catch {
-		return res.status(400).json("1. Error retrieving data. Something went wrong.");
+		return res.status(500).json("2. Error retrieving data. Something went wrong.");
 	}
 
 	// If user exists already, return error, otherwise move ahead with creation
 	if(userData.length !== 0){
 		if(userData[0].user_id){
-			return res.status(500).json("2. There is already an existing user with this email address");
+			return res.status(422).json("3. There is already an existing user with this email address");
 		} else {
-			return res.status(400).json("3. Error retrieving data. Something went wrong");
+			return res.status(500).json("4. Error retrieving data. Something went wrong");
 		}
 	} else {
 		// Hash the plain text password using bcrypt, and set the user's hash to the encrypted hash
@@ -27,14 +31,14 @@ const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
 			delete user.password;
 			user.hash = hash;
 		} catch {
-			return res.status(400).json("4. Error creating account. Something went wrong.");
+			return res.status(500).json("5. Error creating account. Something went wrong.");
 		}
 
 		try {
 			token = await utilities.createToken();
 			user.token = token;
 		} catch {
-			return res.status(400).json("5. Error creating account. Something went wrong.");
+			return res.status(500).json("6. Error creating account. Something went wrong.");
 		}
 
 		try {
@@ -42,7 +46,7 @@ const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
 			delete user.hash;
 			return res.status(201).json(insertedUser);
 		} catch {
-			return res.status(400).json("6. Error creating account. Something went wrong.");
+			return res.status(500).json("7. Error creating account. Something went wrong.");
 		}
 	}
 }
