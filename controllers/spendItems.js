@@ -67,7 +67,7 @@ const getConfig = (req, res, db) => {
 
 }
 
-const addSpend = (req, res, db) => {
+const addSpend = async (req, res, db) => {
 	// Get data from body
 	let spend = {
 		name: req.body.name,
@@ -75,31 +75,43 @@ const addSpend = (req, res, db) => {
 		category_id: req.body.categoryId,
 		sub_category_id: req.body.subCategoryId,
 		purchase_date: req.body.purchaseDate,
+		user_id: req.body.userId
+	}
+
+	if (!req.body.token) {
+		return res.status(401).json("1. Authentication failed. Please log out and log in again.");
+	}
+
+	if (!spend.name || !spend.amount || !spend.category_id || !spend.sub_category_id || !spend.purchase_date || !spend.user_id ){
+		return res.status(400).json("2. Missing request parameters.");
 	}
 	
-	// Validate token
-	db.select('user_id').from('users')
-		.where('token', '=', req.body.token)
-		.then(data => {
-			if(data.length){
-				spend["user_id"] = Number(data[0]["user_id"]);
-				// enter spend into database 
-				db('spend_items')
-					.returning('*')
-					.insert(spend)
-					.then((data) => {
-						let insertedSpend = data[0];
-						res.status(201).json(insertedSpend);
-					})
-					.catch(err => {
-						console.log(err);
-						res.status(400).json("Could not add spend to database");
-					})
-			} else {
-				res.status(400).json("Invalid token. Please log out of the app and sign in again.")
+	// Validate token + userId
+	let userData;
+	try {
+		userData = await db.select('user_id').from('users').where('token', '=', req.body.token);
+	} catch {
+		return res.status(500).json("3. Error retrieving data. Something went wrong.");
+	}
+	
+	if (userData.length){
+		if (spend['user_id'] === userData[0]['user_id']){
+			let data;
+			// If token and userId are valid, add spend to database
+			try {
+				data = await db('spend_items').returning('*').insert(spend);
+				let insertedSpend = data[0]; 
+				return res.status(201).json(insertedSpend);
+			} catch {
+				return res.status(500).json("5. Error updating data. Something went wrong.")
 			}
-		})
 
+		} else {
+			return res.status(401).json("6. Authentication failed. Please log out and log in again.");
+		}
+	} else {
+		return res.status(401).json("4. Authentication failed. Please log out and log in again.");
+	}
 }
 
 const editSpend = (req, res, db) => {
