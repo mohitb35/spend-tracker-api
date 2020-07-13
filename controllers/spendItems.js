@@ -244,6 +244,83 @@ const listSpends = (req, res, db) => {
 		})
 }
 
+const getSummary = async (req, res, db) => {
+	// Get token, category ID from request
+	let { token } = req.params;
+	let categoryId = Number(req.params.categoryId);
+
+	if (!token) {
+		return res.status(401).json("1. Authentication failed. Please log out and log in again.");
+	}
+
+	if (!categoryId && categoryId !== 0){
+		return res.status(400).json("2. Missing request parameters.");
+	}
+
+	// Get user ID from token
+	let userData; 
+	try {
+		userData = await db.select('user_id').from('users').where('token', '=', token);
+	} catch {
+		return res.status(500).json("3. Error retrieving data. Something went wrong.");
+	}
+	
+	// Get all spends for user ID for specific category (or all spends if there is no specific category)
+	if (userData.length){
+		let userId = userData[0]['user_id'];
+
+		let response = {};
+
+		try {
+			if (categoryId !== 0){
+				response.type = "subcategories";
+				response.categoryId = categoryId;
+
+				let categoryData = await db.select('name').from('category').where('id','=', categoryId);
+				response.categoryName = categoryData[0]['name'];
+
+				response.data = await db('spend_items as spends')
+						.join('category as cat', 'spends.category_id', 'cat.id')
+						.join('sub_category as subcat', 'spends.sub_category_id', 'subcat.id')
+						.select(
+							'spends.sub_category_id',
+							'subcat.name as sub_category_name',
+						)
+						.sum('spends.amount as total')
+						.where({
+							'spends.user_id': userId,
+							'spends.category_id': categoryId
+						})
+						.groupBy('subcat.name', 'spends.sub_category_id');
+
+				res.status(200).json(response);
+			} else {
+				response.type = "categories";
+				response.categoryId = categoryId;
+				response.categoryName = 'all';
+
+				response.data = await db('spend_items as spends')
+						.join('category as cat', 'spends.category_id', 'cat.id')
+						.select(
+							'spends.category_id',
+							'cat.name as category_name',
+						)
+						.sum('spends.amount as total')
+						.where({
+							'spends.user_id': userId
+						})
+						.groupBy('cat.name', 'spends.category_id');
+				res.status(200).json(response);	
+			}
+		} catch (err) {
+			return res.status(500).json("5. Error retrieving data. Something went wrong.")
+		}
+
+	} else {
+		return res.status(401).json("4. Authentication failed. Please log out and log in again.");
+	}
+}
+
 module.exports = {
 	listCategories: listCategories,
 	listSubCategories: listSubCategories,
@@ -252,5 +329,6 @@ module.exports = {
 	editSpend: editSpend,
 	deleteSpend: deleteSpend,
 	getConfig: getConfig,
-	listSpends: listSpends
+	listSpends: listSpends,
+	getSummary: getSummary
 };	

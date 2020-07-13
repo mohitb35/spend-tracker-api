@@ -36,6 +36,7 @@ app.get('/spend/categories', (req, res) => { spendsController.listCategories(req
 app.get('/spend/categories/:id', (req, res) => { spendsController.listSubCategories(req, res, db) });
 app.get('/spend/:token/daterange', (req, res) => { spendsController.getDateRange(req, res, db) });
 // app.get('/spend/:token/config', (req, res) => spendsController.getConfig(req, res, db));
+app.get('/spend/:token/summary/:categoryId', (req, res) => { spendsController.getSummary(req, res, db) });
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
