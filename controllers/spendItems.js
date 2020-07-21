@@ -246,6 +246,7 @@ const listSpends = (req, res, db) => {
 
 const getSummary = async (req, res, db) => {
 	// Get token, category ID from request
+	let { minDate, maxDate } = req.query;
 	let { token } = req.params;
 	let categoryId = Number(req.params.categoryId);
 
@@ -285,13 +286,15 @@ const getSummary = async (req, res, db) => {
 						.select(
 							'spends.sub_category_id',
 							'subcat.name as sub_category_name',
+							'subcat.color'
 						)
 						.sum('spends.amount as total')
 						.where({
 							'spends.user_id': userId,
 							'spends.category_id': categoryId
 						})
-						.groupBy('subcat.name', 'spends.sub_category_id');
+						.whereBetween('spends.purchase_date', [minDate, maxDate])
+						.groupBy('subcat.name', 'subcat.color', 'spends.sub_category_id');
 
 				res.status(200).json(response);
 			} else {
@@ -304,15 +307,18 @@ const getSummary = async (req, res, db) => {
 						.select(
 							'spends.category_id',
 							'cat.name as category_name',
+							'cat.color'
 						)
 						.sum('spends.amount as total')
 						.where({
 							'spends.user_id': userId
 						})
-						.groupBy('cat.name', 'spends.category_id');
+						.whereBetween('spends.purchase_date', [minDate, maxDate])
+						.groupBy('cat.name', 'cat.color', 'spends.category_id' );
 				res.status(200).json(response);	
 			}
 		} catch (err) {
+			console.log(err);
 			return res.status(500).json("5. Error retrieving data. Something went wrong.")
 		}
 
