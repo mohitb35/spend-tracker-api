@@ -64,7 +64,7 @@ const createUser = (user, db) => {
 			return trx('users')
 				.returning('*')
 				.insert({
-					user_id: userId[0],
+					user_id: userId[0].id,
 					email: user.email,
 					name: user.name,
 					token: user.token,
