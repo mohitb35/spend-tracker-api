@@ -18,14 +18,12 @@
   },
   "homepage": "https://github.com/mohitb35/spend-tracker-api#readme",
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "knex": "^0.20.1",
-    "pg": "^7.12.1"
+    "knex": "^1.0.1",
+    "pg": "^8.7.1"
   },
-  "devDependencies": {
-    "nodemon": "^1.19.1"
-  }
+  "devDependencies": {}
 }
