@@ -17,13 +17,14 @@ const db = knex(config.DB_CREDENTIALS);
 const app =  express();
 app.use(bodyParser.json());
 app.use(cors());
+
 // app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
+/* app.get('/', (req, res) => {
 	db.select("*").from('spend_items').then(data => {
 		res.send(data);
 	});
-});
+});*/
 
 app.post('/register', (req, res) => { registerController.handleRegister(req, res, db, bcrypt, saltRounds) });
 app.post('/login', (req, res) => { loginController.handleLogin(req, res, db, bcrypt) });

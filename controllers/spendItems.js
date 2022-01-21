@@ -178,7 +178,7 @@ const deleteSpend = (req, res, db) => {
 								.where("id", "=", req.params.id)
 								.del()
 								.then(data => {
-									console.log(data);
+									// console.log(data);
 									res.status(200).json("Delete successful");
 								})
 								.catch(err => {
