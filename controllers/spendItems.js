@@ -26,6 +26,7 @@ const listSubCategories = (req, res, db) => {
 			}
 		})
 		.catch(err => {
+			console.log(err);
 			res.status(400).json("Something went wrong");
 		});
 }
@@ -64,9 +65,9 @@ const getDateRange = (req, res, db) => {
 }
 
 // Combine general info needed
-const getConfig = (req, res, db) => {
+/* const getConfig = (req, res, db) => {
 
-}
+} */
 
 const addSpend = async (req, res, db) => {
 	// Get data from body
