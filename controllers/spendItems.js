@@ -336,7 +336,7 @@ module.exports = {
 	addSpend: addSpend,
 	editSpend: editSpend,
 	deleteSpend: deleteSpend,
-	getConfig: getConfig,
+	// getConfig: getConfig,
 	listSpends: listSpends,
 	getSummary: getSummary
 };	
