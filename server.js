@@ -7,7 +7,7 @@ const knex = require('knex');
 
 const bcrypt = require('bcrypt');
 // const saltRounds = config.SALT_ROUNDS; //for local config only
-const saltRounds = process.env.SALT_ROUNDS;
+const saltRounds = Number(process.env.SALT_ROUNDS);
 console.log("Server JS:", saltRounds, typeof saltRounds);
 
 const registerController = require('./controllers/register');
