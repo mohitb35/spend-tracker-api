@@ -1,4 +1,4 @@
-const config = require('./config');
+// const config = require('./config'); //for local config
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -6,13 +6,24 @@ const cors = require('cors');
 const knex = require('knex');
 
 const bcrypt = require('bcrypt');
-const saltRounds = config.SALT_ROUNDS;
+// const saltRounds = config.SALT_ROUNDS; //for local config only
+const saltRounds = process.env.SALT_ROUNDS;
 
 const registerController = require('./controllers/register');
 const loginController = require('./controllers/login');
 const spendsController = require('./controllers/spendItems');
 
-const db = knex(config.DB_CREDENTIALS);
+// const db = knex(config.DB_CREDENTIALS); //For local config
+
+const DB_CREDENTIALS = ({
+	client: 'pg',
+	connection: {
+	  host : process.env.DB_URL,
+	  ssl: true
+	}
+});
+
+const db = knex(DB_CREDENTIALS);
 
 const app =  express();
 app.use(bodyParser.json());
@@ -41,5 +52,5 @@ app.get('/spend/:token/summary/:categoryId', (req, res) => { spendsController.ge
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
-	console.log("Spend Tracking API Server online...." + new Date());
+	console.log(`Spend Tracking API Server online on port ${port}` + new Date());
 });
