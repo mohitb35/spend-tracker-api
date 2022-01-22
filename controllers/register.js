@@ -1,6 +1,7 @@
 const utilities = require('./utilities');
 
 const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
+	console.log("In handle register:", saltRounds, typeof saltRounds);
 	// Get the details from the body
 	let user = req.body;
 
