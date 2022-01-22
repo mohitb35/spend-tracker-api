@@ -8,6 +8,7 @@ const listCategories = (req, res, db) => {
 			}
 		})
 		.catch(err => {
+			console.log(err);
 			res.status(400).json("Something went wrong");
 		});
 }
