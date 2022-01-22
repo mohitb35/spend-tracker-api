@@ -30,7 +30,8 @@ const handleRegister = async (req, res, db, bcrypt, saltRounds) => {
 			hash = await bcrypt.hash(user.password, saltRounds);
 			delete user.password;
 			user.hash = hash;
-		} catch {
+		} catch(error) {
+			console.log(error);
 			return res.status(500).json("5. Error creating account. Something went wrong.");
 		}
 

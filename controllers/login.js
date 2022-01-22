@@ -115,9 +115,9 @@ const handleLogout = async (req, res, db) => {
 				return res.status(500).json("4. Error updating data. Something went wrong");
 			}
 
-			console.log("Cleared token for the following user:");
-			console.log("User ID:", userInfo[0]['user_id']);
-			console.log("Email:", userInfo[0]['email']);
+			// console.log("Cleared token for the following user:");
+			// console.log("User ID:", userInfo[0]['user_id']);
+			// console.log("Email:", userInfo[0]['email']);
 			return res.status(200).json("5. Logged out successfully");
 
 		} else {
