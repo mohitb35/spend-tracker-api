@@ -1,4 +1,4 @@
-// const config = require('./config'); //for local config
+// const config = require('./config'); //for local config only
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -13,12 +13,12 @@ const registerController = require('./controllers/register');
 const loginController = require('./controllers/login');
 const spendsController = require('./controllers/spendItems');
 
-// const db = knex(config.DB_CREDENTIALS); //For local config
+// const db = knex(config.DB_CREDENTIALS); //For local config only
 
 const DB_CREDENTIALS = ({
 	client: 'pg',
 	connection: {
-	  host : process.env.DB_URL,
+	  connectionString : process.env.DB_URL,
 	  ssl: true
 	}
 });
@@ -52,5 +52,5 @@ app.get('/spend/:token/summary/:categoryId', (req, res) => { spendsController.ge
 
 var port = process.env.PORT || 3000;
 app.listen(port, () => {
-	console.log(`Spend Tracking API Server online on port ${port}` + new Date());
+	console.log(`Spend Tracking API Server online on port ${port} - ` + new Date());
 });
