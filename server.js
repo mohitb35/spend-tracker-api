@@ -19,7 +19,9 @@ const DB_CREDENTIALS = ({
 	client: 'pg',
 	connection: {
 	  connectionString : process.env.DB_URL,
-	  ssl: true
+	  ssl: {
+		rejectUnauthorized: false
+	  }
 	}
 });
 
